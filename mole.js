@@ -9,7 +9,6 @@ window.onload = function() {
 }
 
 function getRandomTile(exclude = []) {
-    
     let num;
     do {
         num = Math.floor(Math.random() * 9).toString();
@@ -18,7 +17,6 @@ function getRandomTile(exclude = []) {
 }
 
 function setGame() {
-
     for (let i = 0; i < 9; i++) {
         let tile = document.createElement("div");
         tile.id = i.toString();
@@ -27,7 +25,6 @@ function setGame() {
     }
 
     setInterval(function setMole() {
-
         if (GameOver) return;
         if (CurrMoleTile) CurrMoleTile.innerHTML = "";
 
@@ -45,7 +42,7 @@ function setGame() {
         CurrPlantTiles.forEach(tile => tile.innerHTML = "");
         CurrPlantTiles = [];
 
-        let plantCount = Math.floor(Math.random() * 3) + 1; // 1 to 3 plants
+        let plantCount = Math.floor(Math.random() * 3) + 1;
         let usedTiles = CurrMoleTile ? [CurrMoleTile.id] : [];
 
         for (let i = 0; i < plantCount; i++) {
@@ -77,7 +74,7 @@ function selectTile() {
 
     if (this === CurrMoleTile) {
         score += 10;
-        document.getElementById("score").innerText = score.toString();
+        document.getElementById("score").innerText = "Score: " + score.toString();
     } else if (CurrPlantTiles.includes(this)) {
         document.getElementById("score").innerText = "Game Over: " + score.toString();
         GameOver = true;
