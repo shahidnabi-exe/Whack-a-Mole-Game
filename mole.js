@@ -1,95 +1,85 @@
-
 let CurrMoleTile;
-let CurrPlantTile;
+let CurrPlantTiles = [];
 let score = 0;
 let GameOver = false;
+let timeLeft = 60;
 
 window.onload = function() {
     setGame();
 }
 
-function  getRandomTile() {
-
-// math.random (0-1) * 9 => (0 - 9) --> round down to (0-8) integers
-    let num = Math.floor (Math.random() * 9 );
-    return num.toString();
+function getRandomTile(exclude = []) {
+    
+    let num;
+    do {
+        num = Math.floor(Math.random() * 9).toString();
+    } while (exclude.includes(num));
+    return num;
 }
 
-function setGame () {
+function setGame() {
 
-    for ( let i = 0; i < 9; i++) {
-        // <div id = "0-8"> </div>
+    for (let i = 0; i < 9; i++) {
         let tile = document.createElement("div");
         tile.id = i.toString();
-        tile.addEventListener("click", selectTile)
+        tile.addEventListener("click", selectTile);
         document.getElementById("board").appendChild(tile);
-
     }
 
-    setInterval( function setMole ()  {
+    setInterval(function setMole() {
 
-        if (GameOver) {
-            return;
-        }
-        if (CurrMoleTile) {
-            CurrMoleTile.innerHTML = "";
-        }
+        if (GameOver) return;
+        if (CurrMoleTile) CurrMoleTile.innerHTML = "";
 
         let mole = document.createElement("img");
         mole.src = "./Images/monty-mole.png";
-    
-        let num = getRandomTile();
-        if ( CurrPlantTile && CurrPlantTile.id === num) {
-            return;
-        }
+
+        let num = getRandomTile(CurrPlantTiles.map(tile => tile.id));
         CurrMoleTile = document.getElementById(num);
         CurrMoleTile.appendChild(mole);
-               
-    },1000);
+    }, 1000);
 
-    setInterval( function setPlant () {
+    setInterval(function setPlants() {
+        if (GameOver) return;
 
-        if (GameOver) {
-            return;
+        CurrPlantTiles.forEach(tile => tile.innerHTML = "");
+        CurrPlantTiles = [];
+
+        let plantCount = Math.floor(Math.random() * 3) + 1; // 1 to 3 plants
+        let usedTiles = CurrMoleTile ? [CurrMoleTile.id] : [];
+
+        for (let i = 0; i < plantCount; i++) {
+            let plant = document.createElement("img");
+            plant.src = "./Images/piranha-plant.png";
+
+            let num = getRandomTile(usedTiles);
+            let plantTile = document.getElementById(num);
+            plantTile.appendChild(plant);
+            CurrPlantTiles.push(plantTile);
+            usedTiles.push(num);
         }
-        if (CurrPlantTile) {
-            CurrPlantTile.innerHTML = "";
-        }
-        let plant = document.createElement("img");
-        plant.src = "./Images/piranha-plant.png";
-    
-        let num = getRandomTile();
-        if ( CurrMoleTile && CurrMoleTile.id === num) {
-            return;
-        }
-        CurrPlantTile = document.getElementById(num);
-        CurrPlantTile.appendChild(plant); 
-        
     }, 2000);
 
-    
+    let timerInterval = setInterval(function() {
+        if (GameOver || timeLeft <= 0) {
+            clearInterval(timerInterval);
+            document.getElementById("score").innerText = "Game Over: " + score.toString();
+            GameOver = true;
+        } else {
+            document.getElementById("timer").innerText = "Time Left: " + timeLeft;
+            timeLeft--;
+        }
+    }, 1000);
 }
 
-function selectTile () {
-    if (GameOver) {
-        return;
-    }
+function selectTile() {
+    if (GameOver) return;
 
-        //this refers to click 
-    if ( this === CurrMoleTile) {
+    if (this === CurrMoleTile) {
         score += 10;
         document.getElementById("score").innerText = score.toString();
-    }
-    else if ( this === CurrPlantTile) {
-        document.getElementById("score").innerText = " Game Over: " +score.toString();  
+    } else if (CurrPlantTiles.includes(this)) {
+        document.getElementById("score").innerText = "Game Over: " + score.toString();
         GameOver = true;
     }
-    
 }
-
-
-
-
-
-
-
